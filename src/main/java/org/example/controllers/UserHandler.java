@@ -7,7 +7,6 @@ public class UserHandler extends ApiController {
     private final Set<String> users;
 
     public UserHandler(Set<String> users) {
-        System.out.println("Userhandler");
         this.users = users;
     }
 

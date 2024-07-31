@@ -1,5 +1,6 @@
 package org.example.router;
 
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.HttpEndpoint;
 import org.example.HttpUtils;
@@ -7,19 +8,17 @@ import org.example.HttpUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class Router {
     private final Map<String, Method> methods = new HashMap<>();
 
     public Router(Method[] methods) {
-
         mapMethods(methods);
     }
 
     private void mapMethods(Method[] methods) {
-        System.out.println("Mapping methods");
-
         for (Method method : methods) {
             if (method.isAnnotationPresent(HttpEndpoint.class)) {
                 HttpEndpoint httpEndpoint = method.getAnnotation(HttpEndpoint.class);
@@ -32,29 +31,23 @@ public class Router {
                 this.methods.put(path, method);
             }
         }
-
-        System.out.println(this.methods.keySet());
     }
 
-    public Method dispatch(URI uri) throws IllegalArgumentException {
-        System.out.println("Uri:" + uri + ";");
-
-        String subUri = HttpUtils.parseUri(uri, 1);
-        System.out.println("SubUri:" + subUri + ";");
-        Method method;
-
+    public Method dispatch(HttpExchange exchange) throws NoSuchMethodException {
         try {
-            method = findMethod(subUri);
-            return method;
-        } catch (NoSuchMethodException e) {
-            System.out.println("Dispatcher didn't find the method with specified name - " + subUri);
-            throw new IllegalArgumentException("No such method");
+            URI requestUri = exchange.getRequestURI();
+            URI path = new URI(exchange.getHttpContext().getPath());
+
+            String functionName = path.relativize(requestUri).getPath();
+            return methods.get(functionName);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private Method findMethod(String subUri) throws NoSuchMethodException {
+    private Method findMethod(String subUri) {
         if (methods.containsKey(subUri)) return methods.get(subUri);
 
-        throw new NoSuchMethodException();
+        return null;
     }
 }

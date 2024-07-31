@@ -5,10 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 
 public class HttpUtils {
     public static String getRequest(HttpExchange exchange) throws IOException {
@@ -30,22 +27,5 @@ public class HttpUtils {
         OutputStream outputStream = exchange.getResponseBody();
         outputStream.write(res.getBytes());
         outputStream.close();
-    }
-
-    public static String parseUri(URI uri, int depth) {
-        ArrayList<String> paths = new ArrayList<String>(Arrays.asList(uri.getPath().split("/")));
-        System.out.println("paths:" + paths + ";");
-
-        if (paths.isEmpty()) {
-            return "";
-        }
-
-        paths.remove(0);
-
-        if (paths.size() <= depth) {
-            return "";
-        }
-
-        return paths.get(depth);
     }
 }

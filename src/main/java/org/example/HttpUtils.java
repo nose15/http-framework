@@ -34,6 +34,12 @@ public class HttpUtils {
 
     public static String parseUri(URI uri, int depth) {
         ArrayList<String> paths = new ArrayList<String>(Arrays.asList(uri.getPath().split("/")));
+        System.out.println("paths:" + paths + ";");
+
+        if (paths.isEmpty()) {
+            return "";
+        }
+
         paths.remove(0);
 
         if (paths.size() <= depth) {

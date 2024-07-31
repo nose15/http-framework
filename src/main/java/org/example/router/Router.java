@@ -7,19 +7,40 @@ import org.example.HttpUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Router {
-    private final List<Method> methods;
+    private final Map<String, Method> methods = new HashMap<>();
 
-    public Router(List<Method> methods) {
-        this.methods = methods;
+    public Router(Method[] methods) {
+
+        mapMethods(methods);
+    }
+
+    private void mapMethods(Method[] methods) {
+        System.out.println("Mapping methods");
+
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(HttpEndpoint.class)) {
+                HttpEndpoint httpEndpoint = method.getAnnotation(HttpEndpoint.class);
+                String path = httpEndpoint.value();
+
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+
+                this.methods.put(path, method);
+            }
+        }
+
+        System.out.println(this.methods.keySet());
     }
 
     public Method dispatch(URI uri) throws IllegalArgumentException {
+        System.out.println("Uri:" + uri + ";");
+
         String subUri = HttpUtils.parseUri(uri, 1);
+        System.out.println("SubUri:" + subUri + ";");
         Method method;
 
         try {
@@ -32,14 +53,7 @@ public class Router {
     }
 
     private Method findMethod(String subUri) throws NoSuchMethodException {
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(HttpEndpoint.class)) {
-                HttpEndpoint httpEndpoint = method.getAnnotation(HttpEndpoint.class);
-                if (httpEndpoint.value().equals(subUri)) {
-                    return method;
-                }
-            }
-        }
+        if (methods.containsKey(subUri)) return methods.get(subUri);
 
         throw new NoSuchMethodException();
     }

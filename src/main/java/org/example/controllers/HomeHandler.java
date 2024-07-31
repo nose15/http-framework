@@ -1,17 +1,14 @@
 package org.example.controllers;
+import org.example.HttpEndpoint;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import org.example.HttpUtils;
+public class HomeHandler extends ApiController {
+    public HomeHandler() {
+        System.out.println("Homehandler");
+    }
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public class HomeHandler implements HttpHandler {
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String req = HttpUtils.getRequest(exchange);
-        HttpUtils.sendResponse(200, req, exchange);
+    @HttpEndpoint("/")
+    public String index(String request) {
+        return "Hello world";
     }
 }
+

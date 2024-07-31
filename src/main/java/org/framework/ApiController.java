@@ -1,9 +1,8 @@
-package org.example.controllers;
+package org.framework;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.example.HttpUtils;
-import org.example.router.Router;
+import org.framework.router.Router;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,10 +11,8 @@ import java.lang.reflect.Method;
 public abstract class ApiController implements HttpHandler {
     private final Router router;
 
-    ApiController() {
+    public ApiController() {
         this.router = new Router(this.getClass().getDeclaredMethods());
-
-
     }
 
     @Override

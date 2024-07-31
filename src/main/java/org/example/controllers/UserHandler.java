@@ -1,6 +1,8 @@
 package org.example.controllers;
 
-import org.example.HttpEndpoint;
+import org.framework.HttpEndpoint;
+import org.framework.ApiController;
+
 import java.util.Set;
 
 public class UserHandler extends ApiController {

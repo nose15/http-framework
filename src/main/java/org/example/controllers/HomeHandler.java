@@ -1,5 +1,6 @@
 package org.example.controllers;
-import org.example.HttpEndpoint;
+import org.framework.HttpEndpoint;
+import org.framework.ApiController;
 
 public class HomeHandler extends ApiController {
     @HttpEndpoint("/")

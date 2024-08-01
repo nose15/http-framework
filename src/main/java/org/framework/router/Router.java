@@ -1,7 +1,8 @@
 package org.framework.router;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.framework.HttpEndpoint;
+import org.framework.router.annotations.HttpGET;
+import org.framework.router.annotations.HttpPOST;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -9,7 +10,8 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 public class Router {
-    private final Map<String, Method> methods = new HashMap<>();
+    private final Map<String, Method> getMethods = new HashMap<>();
+    private final Map<String, Method> postMethods = new HashMap<>();
 
     public Router(Method[] methods) {
         mapMethods(methods);
@@ -17,17 +19,27 @@ public class Router {
 
     private void mapMethods(Method[] methods) {
         for (Method method : methods) {
-            if (method.isAnnotationPresent(HttpEndpoint.class)) {
-                HttpEndpoint httpEndpoint = method.getAnnotation(HttpEndpoint.class);
-                String path = httpEndpoint.value();
-
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-
-                this.methods.put(path, method);
-            }
+            mapSingleMethod(method);
         }
+    }
+
+    private void mapSingleMethod(Method method) {
+        Map<String, Method> methodMap = null;
+        String methodUri = "";
+
+        if (method.isAnnotationPresent(HttpPOST.class)) {
+            methodMap = this.postMethods;
+            methodUri = method.getAnnotation(HttpPOST.class).value();
+        }
+        else if (method.isAnnotationPresent(HttpGET.class)) {
+            methodMap = this.getMethods;
+            methodUri = method.getAnnotation(HttpPOST.class).value();
+        } else {
+            return;
+        }
+
+        if (methodUri.startsWith("/")) methodUri = methodUri.substring(1);
+        methodMap.put(methodUri, method);
     }
 
     public Method dispatch(HttpExchange exchange) throws NoSuchMethodException {
@@ -35,16 +47,18 @@ public class Router {
             URI requestUri = exchange.getRequestURI();
             URI path = new URI(exchange.getHttpContext().getPath());
 
+            String requestMethod = exchange.getRequestMethod();
             String functionName = path.relativize(requestUri).getPath();
+
+            Map<String, Method> methods = switch (requestMethod) {
+                case "POST" -> this.postMethods;
+                case "GET" -> this.getMethods;
+                default -> this.getMethods;
+            };
+
             return methods.get(functionName);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Method findMethod(String subUri) {
-        if (methods.containsKey(subUri)) return methods.get(subUri);
-
-        return null;
     }
 }

@@ -1,6 +1,5 @@
 package org.example.controllers;
 
-import org.framework.HttpEndpoint;
 import org.framework.ApiController;
 
 import java.util.Set;
@@ -12,12 +11,10 @@ public class UserHandler extends ApiController {
         this.users = users;
     }
 
-    @HttpEndpoint("/")
     public String allUsers(String request) {
         return users.toString();
     }
 
-    @HttpEndpoint("/add")
     public String addUser(String request) {
         String username = request;
 

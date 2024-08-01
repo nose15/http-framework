@@ -56,7 +56,9 @@ public class Router {
                 default -> this.getMethods;
             };
 
-            return methods.get(functionName);
+            Method func = methods.get(functionName);
+            if (func == null) throw new NoSuchMethodException();
+            return func;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (NullPointerException e) {

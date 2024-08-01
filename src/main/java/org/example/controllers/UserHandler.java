@@ -1,6 +1,7 @@
 package org.example.controllers;
 
 import org.framework.http.ApiController;
+import org.framework.http.request.Request;
 import org.framework.router.annotations.HttpGET;
 import org.framework.router.annotations.HttpPOST;
 
@@ -14,13 +15,13 @@ public class UserHandler extends ApiController {
     }
 
     @HttpGET("/")
-    public String allUsers(String request) {
+    public String allUsers(Request request) {
         return users.toString();
     }
 
     @HttpPOST("/add")
-    public String addUser(String request) {
-        String username = request;
+    public String addUser(Request request) {
+        String username = request.getBody();
 
         String res;
         if (users.contains(username)) {

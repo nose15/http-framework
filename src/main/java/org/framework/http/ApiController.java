@@ -2,6 +2,7 @@ package org.framework.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.framework.http.request.Request;
 import org.framework.router.Router;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ public abstract class ApiController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String req = HttpUtils.getRequest(exchange);
+        Request req = HttpUtils.getRequest(exchange);
         String res;
 
         try {

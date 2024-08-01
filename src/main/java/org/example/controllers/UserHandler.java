@@ -1,6 +1,8 @@
 package org.example.controllers;
 
 import org.framework.ApiController;
+import org.framework.router.annotations.HttpGET;
+import org.framework.router.annotations.HttpPOST;
 
 import java.util.Set;
 
@@ -11,10 +13,12 @@ public class UserHandler extends ApiController {
         this.users = users;
     }
 
+    @HttpGET("/")
     public String allUsers(String request) {
         return users.toString();
     }
 
+    @HttpPOST("/add")
     public String addUser(String request) {
         String username = request;
 

@@ -33,7 +33,7 @@ public class Router {
         }
         else if (method.isAnnotationPresent(HttpGET.class)) {
             methodMap = this.getMethods;
-            methodUri = method.getAnnotation(HttpPOST.class).value();
+            methodUri = method.getAnnotation(HttpGET.class).value();
         } else {
             return;
         }
@@ -59,6 +59,8 @@ public class Router {
             return methods.get(functionName);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
+        } catch (NullPointerException e) {
+            throw new NoSuchMethodException();
         }
     }
 }

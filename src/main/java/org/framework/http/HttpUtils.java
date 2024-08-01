@@ -1,6 +1,8 @@
-package org.framework;
+package org.framework.http;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.framework.http.request.Request;
+import org.framework.http.request.RequestBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +10,7 @@ import java.io.OutputStream;
 
 
 public class HttpUtils {
-    public static String getRequest(HttpExchange exchange) throws IOException {
+    public static Request getRequest(HttpExchange exchange) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
         StringBuilder reqBody = new StringBuilder();
 
@@ -19,7 +21,12 @@ public class HttpUtils {
         }
         inputStream.close();
 
-        return reqBody.toString();
+        return new RequestBuilder()
+                .setBody(reqBody.toString())
+                .setMethod(exchange.getRequestMethod())
+                .setUri(exchange.getRequestURI())
+                .addHeaders(exchange.getRequestHeaders())
+                .build();
     }
 
     public static void sendResponse(int status, String res, HttpExchange exchange) throws IOException {

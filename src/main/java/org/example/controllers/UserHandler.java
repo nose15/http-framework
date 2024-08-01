@@ -1,6 +1,6 @@
 package org.example.controllers;
 
-import org.framework.ApiController;
+import org.framework.http.ApiController;
 import org.framework.router.annotations.HttpGET;
 import org.framework.router.annotations.HttpPOST;
 

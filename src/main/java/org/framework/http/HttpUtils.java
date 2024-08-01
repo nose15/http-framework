@@ -3,6 +3,7 @@ package org.framework.http;
 import com.sun.net.httpserver.HttpExchange;
 import org.framework.http.request.Request;
 import org.framework.http.request.RequestBuilder;
+import org.framework.router.HttpMethod;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ public class HttpUtils {
 
         return new RequestBuilder()
                 .setBody(reqBody.toString())
-                .setMethod(exchange.getRequestMethod())
+                .setMethod(HttpMethod.valueOf(exchange.getRequestMethod()))
                 .setUri(exchange.getRequestURI())
                 .addHeaders(exchange.getRequestHeaders())
                 .build();

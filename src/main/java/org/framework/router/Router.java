@@ -29,12 +29,22 @@ public class Router {
         String methodUri = "";
 
         if (method.isAnnotationPresent(HttpPOST.class)) {
-            methodMap = this.postMethods;
             methodUri = method.getAnnotation(HttpPOST.class).value();
+
+            Route route = routeMap.getOrDefault(methodUri, new Route(methodUri));
+            route.addHandler(HttpMethod.POST, method);
+
+            routeMap.put(methodUri, route);
+            methodMap = this.postMethods;
         }
         else if (method.isAnnotationPresent(HttpGET.class)) {
-            methodMap = this.getMethods;
             methodUri = method.getAnnotation(HttpGET.class).value();
+
+            Route route = routeMap.getOrDefault(methodUri, new Route(methodUri));
+            route.addHandler(HttpMethod.GET, method);
+
+            routeMap.put(methodUri, route);
+            methodMap = this.getMethods;
         } else {
             return;
         }

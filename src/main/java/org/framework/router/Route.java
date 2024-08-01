@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Route {
     private final String subUri;
-    private final Map<String, Method> methodHandlers = new HashMap<>();
+    private final Map<HttpMethod, Method> methodHandlers = new HashMap<>();
 
     public Route(String subUri) {
         this.subUri = subUri;
@@ -15,7 +15,7 @@ public class Route {
         return subUri;
     }
 
-    public Method getHandler(String method) {
+    public Method getHandler(HttpMethod method) {
         if (!methodHandlers.containsKey(method)) {
             return null;
         }
@@ -23,11 +23,11 @@ public class Route {
         return methodHandlers.get(method);
     }
 
-    public void addHandler(String method, Method handler) {
+    public void addHandler(HttpMethod method, Method handler) {
         methodHandlers.put(method, handler);
     }
 
-    public Set<String> getAllowedMethods() {
+    public Set<HttpMethod> getAllowedMethods() {
         return methodHandlers.keySet();
     }
 }

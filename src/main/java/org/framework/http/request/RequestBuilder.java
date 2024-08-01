@@ -1,6 +1,7 @@
 package org.framework.http.request;
 
 import com.sun.net.httpserver.Headers;
+import org.framework.router.HttpMethod;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -9,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 public class RequestBuilder {
-    private String method;
+    private HttpMethod method;
     private URI uri;
     private final Headers headers = new Headers();
     private String body;
 
-    public RequestBuilder setMethod(String method) {
+    public RequestBuilder setMethod(HttpMethod method) {
         this.method = method;
         return this;
     }

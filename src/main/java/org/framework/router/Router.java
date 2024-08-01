@@ -7,6 +7,7 @@ import org.framework.router.annotations.HttpPOST;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.Annotation;
 import java.util.*;
 
 public class Router {
@@ -25,33 +26,24 @@ public class Router {
     }
 
     private void mapSingleMethod(Method method) {
-        Map<String, Method> methodMap = null;
         String methodUri = "";
 
         if (method.isAnnotationPresent(HttpPOST.class)) {
-            methodUri = method.getAnnotation(HttpPOST.class).value();
+            methodUri = parseMethodUri(method.getAnnotation(HttpPOST.class).value());
 
             Route route = routeMap.getOrDefault(methodUri, new Route(methodUri));
             route.addHandler(HttpMethod.POST, method);
 
             routeMap.put(methodUri, route);
-            methodMap = this.postMethods;
         }
         else if (method.isAnnotationPresent(HttpGET.class)) {
-            methodUri = method.getAnnotation(HttpGET.class).value();
+            methodUri = parseMethodUri(method.getAnnotation(HttpGET.class).value());
 
             Route route = routeMap.getOrDefault(methodUri, new Route(methodUri));
             route.addHandler(HttpMethod.GET, method);
 
             routeMap.put(methodUri, route);
-            methodMap = this.getMethods;
-        } else {
-            return;
         }
-
-        if (methodUri.startsWith("/")) methodUri = methodUri.substring(1);
-
-        methodMap.put(methodUri, method);
     }
 
     public Method dispatch(HttpExchange exchange) throws NoSuchMethodException {
@@ -59,22 +51,25 @@ public class Router {
             URI requestUri = exchange.getRequestURI();
             URI path = new URI(exchange.getHttpContext().getPath());
 
-            String requestMethod = exchange.getRequestMethod();
+            HttpMethod requestMethod = HttpMethod.valueOf(exchange.getRequestMethod());
             String functionName = path.relativize(requestUri).getPath();
 
-            Map<String, Method> methods = switch (requestMethod) {
-                case "POST" -> this.postMethods;
-                case "GET" -> this.getMethods;
-                default -> this.getMethods;
-            };
+            Route route = routeMap.get(functionName);
 
-            Method func = methods.get(functionName);
-            if (func == null) throw new NoSuchMethodException();
-            return func;
+            if (route != null && route.getAllowedMethods().contains(requestMethod)) {
+                return route.getHandler(requestMethod);
+            }
+
+            return null;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (NullPointerException e) {
             throw new NoSuchMethodException();
         }
+    }
+
+    private String parseMethodUri(String methodUri) {
+        if (methodUri.startsWith("/")) methodUri = methodUri.substring(1);
+        return methodUri;
     }
 }

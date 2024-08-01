@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 public class Router {
+    private final Map<String, Route> routeMap = new HashMap<>();
     private final Map<String, Method> getMethods = new HashMap<>();
     private final Map<String, Method> postMethods = new HashMap<>();
 
@@ -39,6 +40,7 @@ public class Router {
         }
 
         if (methodUri.startsWith("/")) methodUri = methodUri.substring(1);
+
         methodMap.put(methodUri, method);
     }
 

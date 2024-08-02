@@ -1,13 +1,11 @@
 package org.framework.http.request;
 
 import com.sun.net.httpserver.Headers;
-import org.framework.router.HttpMethod;
+import org.framework.http.utils.HttpMethod;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RequestBuilder {
     private HttpMethod method;

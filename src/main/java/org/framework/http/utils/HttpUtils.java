@@ -1,9 +1,8 @@
-package org.framework.http;
+package org.framework.http.utils;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.framework.http.request.Request;
 import org.framework.http.request.RequestBuilder;
-import org.framework.router.HttpMethod;
 
 import java.io.IOException;
 import java.io.InputStream;

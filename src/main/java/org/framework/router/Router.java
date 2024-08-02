@@ -1,19 +1,17 @@
 package org.framework.router;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.framework.http.utils.HttpMethod;
 import org.framework.router.annotations.HttpGET;
 import org.framework.router.annotations.HttpPOST;
 
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.Annotation;
 import java.util.*;
 
 public class Router {
     private final Map<String, Route> routeMap = new HashMap<>();
-    private final Map<String, Method> getMethods = new HashMap<>();
-    private final Map<String, Method> postMethods = new HashMap<>();
 
     public Router(Method[] methods) {
         mapMethods(methods);
@@ -46,25 +44,15 @@ public class Router {
         }
     }
 
-    public Method dispatch(HttpExchange exchange) throws NoSuchMethodException {
+    public Route dispatch(HttpExchange exchange) {
         try {
             URI requestUri = exchange.getRequestURI();
             URI path = new URI(exchange.getHttpContext().getPath());
-
-            HttpMethod requestMethod = HttpMethod.valueOf(exchange.getRequestMethod());
             String functionName = path.relativize(requestUri).getPath();
 
-            Route route = routeMap.get(functionName);
-
-            if (route != null && route.getAllowedMethods().contains(requestMethod)) {
-                return route.getHandler(requestMethod);
-            }
-
-            return null;
+            return routeMap.get(functionName);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
-        } catch (NullPointerException e) {
-            throw new NoSuchMethodException();
         }
     }
 

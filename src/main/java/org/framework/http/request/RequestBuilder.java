@@ -1,13 +1,14 @@
 package org.framework.http.request;
 
 import com.sun.net.httpserver.Headers;
+import org.framework.Builder;
 import org.framework.http.utils.HttpMethod;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RequestBuilder {
+public class RequestBuilder implements Builder<Request> {
     private HttpMethod method;
     private URI uri;
     private final Headers headers = new Headers();
@@ -40,6 +41,7 @@ public class RequestBuilder {
         return this;
     }
 
+    @Override
     public Request build() {
         return new Request(
             this.method,

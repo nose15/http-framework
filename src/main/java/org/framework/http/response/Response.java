@@ -24,9 +24,18 @@ public class Response {
         return status;
     }
 
+    public int getStatusCode() {
+        return status.getStatusCode();
+    }
+
     public Response(HttpStatus status, Headers headers, String body) {
         this.status = status;
         this.headers.putAll(headers);
+        this.body = body;
+    }
+
+    public Response(HttpStatus status, String body) {
+        this.status = status;
         this.body = body;
     }
 }

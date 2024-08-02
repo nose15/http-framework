@@ -3,6 +3,8 @@ package org.framework.http;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.framework.http.request.Request;
+import org.framework.http.response.Response;
+import org.framework.http.response.ResponseBuilder;
 import org.framework.http.utils.HttpMethod;
 import org.framework.http.utils.HttpStatus;
 import org.framework.http.utils.HttpUtils;
@@ -24,7 +26,7 @@ public abstract class ApiController implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Request req = HttpUtils.getRequest(exchange);
-        String res;
+        Response res;
         HttpStatus status;
 
         try {
@@ -34,25 +36,33 @@ public abstract class ApiController implements HttpHandler {
                 Method handler = route.getHandler(HttpMethod.valueOf(exchange.getRequestMethod()));
 
                 if (handler != null) {
-                    res = handler.invoke(this, req).toString();
-                    status = HttpStatus.OK_200;
+                    res = (Response) handler.invoke(this, req);
                 }
                 else {
-                    res = exchange.getRequestMethod() + " not allowed";
-                    status = HttpStatus.NOT_ALLOWED_405;
+                    ResponseBuilder responseBuilder = new ResponseBuilder();
+                    res = responseBuilder
+                            .setStatusCode(HttpStatus.NOT_ALLOWED_405)
+                            .setBody(exchange.getRequestMethod() + " not allowed")
+                            .build();
                 }
             } else {
-                res = "Not found";
-                status = HttpStatus.NOT_FOUND_404;
+                ResponseBuilder responseBuilder = new ResponseBuilder();
+                res = responseBuilder
+                        .setStatusCode(HttpStatus.NOT_FOUND_404)
+                        .setBody("Not found")
+                        .build();
             }
 
 
         } catch (InvocationTargetException | IllegalAccessException | RuntimeException e) {
             System.out.println(e);
-            res = "Internal server error";
-            status = HttpStatus.INTERNAL_SERVER_ERROR_500;
+            ResponseBuilder responseBuilder = new ResponseBuilder();
+            res = responseBuilder
+                    .setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR_500)
+                    .setBody("Inernal server error")
+                    .build();
         }
 
-        HttpUtils.sendResponse(status.getStatusCode(), res, exchange);
+        HttpUtils.sendResponse(res, exchange);
     }
 }

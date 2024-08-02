@@ -3,6 +3,7 @@ package org.framework.http.utils;
 import com.sun.net.httpserver.HttpExchange;
 import org.framework.http.request.Request;
 import org.framework.http.request.RequestBuilder;
+import org.framework.http.response.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,10 +30,11 @@ public class HttpUtils {
                 .build();
     }
 
-    public static void sendResponse(int status, String res, HttpExchange exchange) throws IOException {
-        exchange.sendResponseHeaders(status, res.length());
+    public static void sendResponse(Response response, HttpExchange exchange) throws IOException {
+        String body = response.getBody();
+        exchange.sendResponseHeaders(response.getStatusCode(), body.length());
         OutputStream outputStream = exchange.getResponseBody();
-        outputStream.write(res.getBytes());
+        outputStream.write(body.getBytes());
         outputStream.close();
     }
 }

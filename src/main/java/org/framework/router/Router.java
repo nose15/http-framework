@@ -2,9 +2,7 @@ package org.framework.router;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.framework.http.utils.HttpMethod;
-import org.framework.router.annotations.HttpGET;
 import org.framework.router.annotations.HttpMapping;
-import org.framework.router.annotations.HttpPOST;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -62,13 +60,10 @@ public class Router {
 
     private Annotation findFirstHttpMappingAnnotation(Method handler) {
         Annotation[] annotations = handler.getDeclaredAnnotations();
-
         for (Annotation annotation: annotations) {
             if (!annotation.annotationType().isAnnotationPresent(HttpMapping.class)) continue;
-
             return annotation;
         }
-
         return null;
     }
 

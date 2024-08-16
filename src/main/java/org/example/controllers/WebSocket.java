@@ -4,52 +4,70 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
-@ServerEndpoint(value = "/chat")
+@ServerEndpoint(value = "/chat/{room_id}")
 public class WebSocket {
     private Session session;
-    private static Set<WebSocket> webSockets;
-    private static HashMap<String, String> users = new HashMap<>();
+    private static final Set<WebSocket> connections = new HashSet<>();
+    private int roomId;
 
     @OnOpen
     public void onOpen(
         Session session
     ) throws IOException, EncodeException {
         this.session = session;
-        webSockets.add(this);
+        connections.add(this);
+        Map<String, List<String>> params = session.getRequestParameterMap();
+        this.roomId = Integer.parseInt(params.get("room_id").get(0));
 
-        System.out.println("Dupa");
-        broadcast("Twoja matka");
+        System.out.println("Connected " + session.getBasicRemote() + " to room " + this.roomId);
     }
 
     @OnMessage
-    public void onMessage(String message, Session session) throws IOException {
-        System.out.println(message);
+    public void onMessage(String message, Session session) throws IOException, EncodeException {
+        sendToRoom(this.roomId, message);
     }
 
     @OnClose
     public void onClose(Session session) throws IOException {
-        // WebSocket connection closes
+        connections.remove(this);
+        System.out.println("Closed");
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        // Do error handling here
+        System.out.println(throwable.getMessage());
+    }
+
+    private static void sendToRoom(int roomId, String message) {
+        connections.forEach(endpoint -> {
+            try {
+                if (endpoint.getRoomId() == roomId)
+                    endpoint.session.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private static void broadcast(String message)
             throws IOException, EncodeException {
 
-        webSockets.forEach(endpoint -> {
-            synchronized (endpoint) {
-                try {
-                    endpoint.session.getBasicRemote().sendObject(message);
-                } catch (IOException | EncodeException e) {
-                    e.printStackTrace();
-                }
+        connections.forEach(endpoint -> {
+            try {
+                endpoint.session.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
             }
         });
+    }
+
+    public int getRoomId() {
+        return this.roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
     }
 }

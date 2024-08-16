@@ -1,4 +1,11 @@
 package org.framework.router;
 
-public class RouterTest {
+import org.junit.Test;
+
+// TODO: Write tests
+public class RouterTests {
+    @Test
+    public void routerMapping() {
+
+    }
 }
